@@ -1,0 +1,71 @@
+class Solution {
+
+    //Recursion
+
+    int f(vector<int>& nums,int idx, int target, int total, int removal){
+        if(total==target){return removal;}
+        if(idx==nums.size()){
+            return INT_MAX;
+        }
+
+        int a =f(nums, idx+1, target,total^nums[idx],removal+1);
+        int b =f(nums, idx+1,target, total, removal);
+
+        return min(a,b);
+    }
+
+public:
+    int minRemovals(vector<int>& nums, int target) {
+        if(nums.size()==0) return 0;
+
+        int removal=0, total=0;
+        for(int i=0; i<nums.size(); i++){
+            total^=nums[i];
+        }
+
+        vector<vector<int>> dp(nums.size(), vector<int>(total+1));
+        
+        int ans= f(nums, 0, target, total, removal);        
+        return ans==INT_MAX ? -1 : ans;
+    }
+};
+
+
+//Memoization
+
+
+class Solution {
+    using ll =long long;
+    unordered_map<string,int> dp;
+
+    ll f(vector<int>& nums,int idx, int target, int total,unordered_map<string,int>& dp){
+        if(total==target){return 0;}
+        if(idx==nums.size()){
+            return INT_MAX;
+        }
+
+        string key = to_string(idx)+','+to_string(total);
+        if(dp.find(key)!=dp.end()) return dp[key];
+
+        ll a = 1 + f(nums, idx+1, target,(total^nums[idx]), dp);
+        ll b =f(nums, idx+1,target, total,dp);
+
+        return dp[key]=min(a,b);
+
+    }
+
+
+public:
+    int minRemovals(vector<int>& nums, int target) {
+        if(nums.size()==0) return 0;
+
+        int total=0;
+        for(int i=0; i<nums.size(); i++){
+            total^=nums[i];
+        }
+
+        
+        int ans= f(nums, 0, target, total,dp);        
+        return ans==INT_MAX ? -1 : ans;
+    }
+};
