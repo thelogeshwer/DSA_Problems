@@ -32,8 +32,6 @@ public:
 
 
 //Memoization
-
-
 class Solution {
     using ll =long long;
     unordered_map<string,int> dp;
@@ -67,5 +65,42 @@ public:
         
         int ans= f(nums, 0, target, total,dp);        
         return ans==INT_MAX ? -1 : ans;
+    }
+};
+
+
+
+//Tabulation
+class Solution {
+public:
+    int minRemovals(vector<int>& nums, int target) {
+        int n = nums.size();
+        int total =0;
+        for(int num : nums){total^=num;}
+
+        const int maxXor =16384;
+        const int INF = 1e9;
+        //we need empty array 1 row, so (n+1)
+        vector<vector<int>> dp(n+1, vector<int>(maxXor,INF));
+
+        //base case when array is empty return 0.
+        dp[0][target]=0;
+
+        for(int i=1;i<=n; i++){
+            for(int xr=0; xr<maxXor; xr++){
+
+                //not remove from current total xor
+                dp[i][xr]=min(dp[i][xr], dp[i-1][xr]);
+
+                //removing we need add 1 remove + (nums[i]^xor) at that total xor, how many removals.
+                int prev=nums[i-1]^xr;
+                dp[i][xr]=min(dp[i][xr],1+dp[i-1][prev]);
+
+            }
+        }
+
+        int ans = dp[n][total];
+        return ans>=INF ?-1 : ans;
+
     }
 };
